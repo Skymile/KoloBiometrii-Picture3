@@ -13,5 +13,43 @@
         </Grid.ColumnDefinitions>
 
         <Image Name="MainImage"/>
+        <StackPanel Grid.Column="1">
+            <Slider
+                Name="MainSliderR1"
+                Minimum="0"
+                Maximum="255"
+                IsSnapToTickEnabled="True"
+                ValueChanged="Slider_ValueChanged" />
+            <Slider
+                Name="MainSliderG1"
+                Minimum="0"
+                Maximum="255"
+                IsSnapToTickEnabled="True"
+                ValueChanged="Slider_ValueChanged" />
+            <Slider
+                Name="MainSliderB1"
+                Minimum="0"
+                Maximum="255"
+                IsSnapToTickEnabled="True"
+                ValueChanged="Slider_ValueChanged" />
+            <Slider
+                Name="MainSliderR2"
+                Minimum="0"
+                Maximum="255"
+                IsSnapToTickEnabled="True"
+                ValueChanged="Slider_ValueChanged" />
+            <Slider
+                Name="MainSliderG2"
+                Minimum="0"
+                Maximum="255"
+                IsSnapToTickEnabled="True"
+                ValueChanged="Slider_ValueChanged" />
+            <Slider
+                Name="MainSliderB2"
+                Minimum="0"
+                Maximum="255"
+                IsSnapToTickEnabled="True"
+                ValueChanged="Slider_ValueChanged" />
+        </StackPanel>
     </Grid>
 </Window>
