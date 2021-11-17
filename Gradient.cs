@@ -5,14 +5,25 @@ namespace WpfApp5
 {
 	public class Gradient
 	{
-		public static Bitmap Apply(
+		public unsafe static Bitmap Apply(
 				Bitmap bmp,
-				int r1, int g1, int b1,
-				int r2, int g2, int b2
+				int sliderR1,
+				int sliderG1,
+				int sliderB1,
+				int sliderR2,
+				int sliderG2,
+				int sliderB2
 			)
 		{
-			return bmp;
-			/*
+			var data = bmp.LockBits(
+				new Rectangle(Point.Empty, bmp.Size),
+				ImageLockMode.ReadWrite,
+				PixelFormat.Format24bppRgb
+			);
+
+			byte* ptr = (byte*)data.Scan0.ToPointer();
+			int stride = data.Stride;
+
 			int ratioX = bmp.Width / 256;
 			int ratioY = bmp.Height / 256;
 
@@ -21,13 +32,13 @@ namespace WpfApp5
 					for (int x = 0; x < ratioX; x++)
 						for (int y = 0; y < ratioY; y++)
 						{
-							int r1 = (int)MainSliderR1.Value - i;
-							int g1 = (int)MainSliderG1.Value - i;
-							int b1 = (int)MainSliderB1.Value - i;
+							int r1 = sliderR1 - i;
+							int g1 = sliderG1 - i;
+							int b1 = sliderB1 - i;
 
-							int r2 = i - 255 + (int)MainSliderR2.Value;
-							int g2 = i - 255 + (int)MainSliderG2.Value;
-							int b2 = i - 255 + (int)MainSliderB2.Value;
+							int r2 = i - 255 + sliderR2;
+							int g2 = i - 255 + sliderG2;
+							int b2 = i - 255 + sliderB2;
 
 							if (r1 > 255) r1 = 255;
 							if (g1 > 255) g1 = 255;
@@ -43,23 +54,48 @@ namespace WpfApp5
 							if (g2 < 0) g2 = 0;
 							if (b2 < 0) b2 = 0;
 
-							var color = bmp.GetPixel(
-								i * ratioX + x,
-								j * ratioY + y
+							int cIndex = GetIndex(i * ratioX + x, j * ratioY + y, stride);
+							var color = Color.FromArgb(
+								ptr[cIndex + 0],
+								ptr[cIndex + 1],
+								ptr[cIndex + 2]
 							);
 
-							bmp.SetPixel(
-								i * ratioX + x,
-								j * ratioY + y,
-								Color.FromArgb(
-									(color.R + r1 + r2) / 2,
-									(color.G + g1 + g2) / 2,
-									(color.B + b1 + b2) / 2
-								)
-							);
+							ptr[cIndex + 0] = (byte)((color.R + r1 + r2) / 2);
+							ptr[cIndex + 1] = (byte)((color.G + g1 + g2) / 2);
+							ptr[cIndex + 2] = (byte)((color.B + b1 + b2) / 2);
+
+							//var color = bmp.GetPixel(
+							//	i * ratioX + x,
+							//	j * ratioY + y
+							//);
+
+							//bmp.SetPixel(
+							//	i * ratioX + x,
+							//	j * ratioY + y,
+							//	Color.FromArgb(
+							//		(color.R + r1 + r2) / 2,
+							//		(color.G + g1 + g2) / 2,
+							//		(color.B + b1 + b2) / 2
+							//	)
+							//);
 						}
-				*/
+
+			bmp.UnlockBits(data);
+			return bmp;
 		}
+
+		// 0 1 2 3  4  5
+		// 6 7 8 9 10 11
+		//
+		// RGB
+		// Stride = 6
+		// Szerokość = 2
+		// Wysokość = 2
+		/// 1 * 3 + 0 * 6
+
+		private static int GetIndex(int x, int y, int stride) =>
+			y * stride + x * 3;
 
 		public static System.Windows.Media.Imaging.BitmapSource ToSource(Bitmap bmp)
 		{
